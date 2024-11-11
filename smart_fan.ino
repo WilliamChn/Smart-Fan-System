@@ -1,52 +1,46 @@
-#include <DHT.h>
+#include <dht.h>
 
-// Define the pin and type of DHT sensor you are using
-#define DHTPIN 2       // Digital pin connected to the DHT sensor
-#define DHTTYPE DHT11  // DHT11 sensor
+#define tempsensor 2       
 
-#define FAN_PIN 7
-#define RED_LED 6
-#define BLUE_LED 5
+#define FAN 7
+#define RED_LIGHT 6
+#define BLUE_LIGHT 5
 
-
-// Initialize the DHT sensor
-DHT dht(DHTPIN, DHTTYPE);
+dht DHT;
 
 void setup() {
 
-  pinMode(FAN_PIN, OUTPUT); // Set the fan control pin as output
-  pinMode(RED_LED, OUTPUT);
-  pinMode(BLUE_LED, OUTPUT);
-  digitalWrite(FAN_PIN, LOW); // Start with the fan off
+  pinMode(FAN, OUTPUT); 
+
+  pinMode(RED_LIGHT, OUTPUT);
+  pinMode(BLUE_LIGHT, OUTPUT);
+  digitalWrite(FAN, LOW);
 
   Serial.begin(9600);
-  Serial.println("DHT11 Temperature Sensor\n\n");
-  dht.begin();  // Start the DHT sensor
+  
 }
 
 void loop() {
-  float temperature = dht.readTemperature();
 
-  // Check if the readings are valid
-  if (isnan(temperature)) {
-    Serial.println("Failed to read from DHT sensor!");
-    return; 
-  }
+  DHT.read11(tempsensor);
 
-  // Display the temperature 
+  float cel = DHT.temperature;
+  float temperature = (cel * 9.0 / 5.0) + 32.0;
+
+  
   Serial.print("Temperature = ");
   Serial.print(temperature);
-  Serial.println("°C");
+  Serial.println("°F");
 
-  if (temperature > 25) { // Example threshold temperature (adjust as needed)
-    digitalWrite(FAN_PIN, HIGH); 
-    digitalWrite(RED_LED, LOW);  
-    digitalWrite(BLUE_LED, HIGH);   
+  if (temperature > 72) { // temperary threshold set 
+    digitalWrite(FAN, HIGH); 
+    digitalWrite(RED_LIGHT, LOW);  
+    digitalWrite(BLUE_LIGHT, HIGH);   
     Serial.println("Fan ON");
   } else {
-    digitalWrite(FAN_PIN, LOW); 
-    digitalWrite(RED_LED, HIGH);   
-    digitalWrite(BLUE_LED, LOW);  
+    digitalWrite(FAN, LOW); 
+    digitalWrite(RED_LIGHT, HIGH);   
+    digitalWrite(BLUE_LIGHT, LOW);  
     Serial.println("Fan OFF");
   }
 
